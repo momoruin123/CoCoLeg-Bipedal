@@ -32,11 +32,6 @@ function [h, lb, ub, boundName] = inequalityConstraints(config, Z, P_sym, N)
     ub = [];
     boundName = cell(0, 1);
 
-    %% Auxiliary Variable Bounds
-    % Time step bounds
-    a_lb.dt = 0.002;    % Minimum time step [s]
-    a_ub.dt = 0.05;
-
     %% Additional Dynamic Constraints
     % Extract variables from decision vector
     Z = reshape(Z, n_rows, n_columns);
@@ -87,9 +82,9 @@ function [h, lb, ub, boundName] = inequalityConstraints(config, Z, P_sym, N)
         boundName{end+1,1} = name_bound;
     end
 
-    %% Vertical Foot Clearance Constraint
-    % At the last segment of flight phase, old stance foot should be higher
-    % than old swing foot (from last SingleStance phase)
+    %% Vertical clearance constraint betweent two foot
+    % At the last segment of flight phase, stance foot should be higher
+    % than swing foot (from last SingleStance phase)
 
     % Extract necessary state
     xT  = x(:, end);
@@ -104,7 +99,7 @@ function [h, lb, ub, boundName] = inequalityConstraints(config, Z, P_sym, N)
     % Bounds
     lower_bound = 0;
     upper_bound = inf;
-    name_bound = 'foot_clearance';
+    name_bound = 'bipedal_foot_clearance';
 
     % Extend
     h  = [h ; ineq];
@@ -112,30 +107,7 @@ function [h, lb, ub, boundName] = inequalityConstraints(config, Z, P_sym, N)
     ub = [ub; upper_bound];
     boundName{end+1,1} = name_bound;
 
-    % In the middle of the segemets, the swing foot should be higher than
-    % a flatt curve
-    % swingFoot_pos = pos_SwingFoot_f(x, p_full);
-    % swingFoot_pos_y = swingFoot_pos(2,:)';
-    % 
-    % limit_lift_height = 0.1;
-    % offset = floor(n_columns/6);
-    % for k = offset:n_columns-offset
-    %     y_k = swingFoot_pos_y(k);
-    %     t_swing = k/n_columns;
-    %     target_y = limit_lift_height * sin(pi * t_swing);
-    % 
-    %     ineq = y_k;
-    %     lower_bound = target_y;
-    %     upper_bound = inf;
-    %     name_bound = sprintf('y_swing_phase_%d', k);
-    % 
-    %     h = [h; ineq];
-    %     lb = [lb; lower_bound];
-    %     ub = [ub; upper_bound];
-    %     boundName{end+1,1} = name_bound; 
-    % end
-
-    %% 2. Swing foot velocity constraints
+    %% Swing foot velocity constraints
     % Extract necessary state
     dqT  = dq(:, end);
 

@@ -15,7 +15,7 @@ config.paramValues.k_k = 20;
 
 trajInit = initial_guess(config, 1, 0.5, 1);
 traj_full = trajToFulltraj(config, trajInit, 1);
-getAnimationRABBIT(traj_full, 0, config,[]);
+% getAnimationRABBIT(traj_full, 0, config,[]);
 
 % load result\trajPlot_20260211_113035.mat
 
@@ -35,7 +35,7 @@ traj_full = trajToFulltraj(config, trajPlot, 1);
 % plot_traj(config, trajPlot, [], [], []);
 
 %% Save Animation
-save_flag = true;
+save_flag = false;
 file_name = 'run_gait';
 % file_name = mfilename;
 time = datetime('now', 'Format','uuuuMMdd_HHmmss');

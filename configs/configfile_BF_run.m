@@ -20,7 +20,7 @@ config.operatingCond.x0 = 0;                % Initial x-position [m]
 % config.stepLength = 0.5;
 
 config.optGaitMethods = 'Fix_average_velocity';
-config.operatingCond.v_avg = 2.5;             % Average forward velocity [m/s]
+config.operatingCond.v_avg = 2;             % Average forward velocity [m/s]
 
 %% Numerical Discretization
 config.collocationScheme  = 'hermiteSimpson';   % Collocation method for dynamics
