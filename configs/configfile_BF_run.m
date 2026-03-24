@@ -43,10 +43,10 @@ config.periodicityMatrix = eye(10);
 % config.optParameterLowerBound = [-pi/2, -pi/2, 1e-6, 1e-6];               % Minimum leg stiffness
 % config.optParameterUpperBound = [pi/2, pi/2, 1000, 1000];                 % Maximum leg stiffness
 
-% config.optParameterNames = {'k_h', 'k_k'};               % Leg stiffness to optimize
-% config.optParameterInit  = [20, 20];                          % Initial guess
-% config.optParameterLowerBound = [1e-6, 1e-6];               % Minimum leg stiffness
-% config.optParameterUpperBound = [1000, 1000];   
+config.optParameterNames = {'k_h', 'k_k'};               % Leg stiffness to optimize
+config.optParameterInit  = [20, 20];                          % Initial guess
+config.optParameterLowerBound = [1e-6, 1e-6];               % Minimum leg stiffness
+config.optParameterUpperBound = [1000, 1000];   
 
 % config.optParameterNames = {'k_h'};               % Leg stiffness to optimize
 % config.optParameterInit  = [20];                          % Initial guess
@@ -54,10 +54,10 @@ config.periodicityMatrix = eye(10);
 % config.optParameterUpperBound = [1000];                 % Maximum leg stiffness
 
 % Alternative: No parameter optimization
-config.optParameterNames = {};
-config.optParameterInit  = [];
-config.optParameterLowerBound = [];
-config.optParameterUpperBound = [];
+% config.optParameterNames = {};
+% config.optParameterInit  = [];
+% config.optParameterLowerBound = [];
+% config.optParameterUpperBound = [];
 
 %% Optimize time
 config.optimizeTimeFlag = 1;    % for now always 1

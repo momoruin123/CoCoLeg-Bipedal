@@ -65,7 +65,7 @@ optParameterNames = config.optParameterNames;
 % grid sample of velocity
 % v_avg_grid   = [1.4, 1.7];
 % v_avg_grid   = [0.01, 0.1:0.1:1.5];
-v_avg_grid   =0.2:0.2:4;
+v_avg_grid   =0.5:0.5:5;
 
 % v_avg_grid   = 0.001:0.1:1.501;
 num_v_avg    = numel(v_avg_grid);
@@ -74,13 +74,13 @@ num_v_avg    = numel(v_avg_grid);
 % k_h_grid, k_k_grid, L_grid, H_grid, phi_grid
 
 % Config. of sampling
-n_samples = 200;
+n_samples = 20;
 % lb = [1e-6, 1e-6, 0, 0, -pi/4]; % lower bounds
 % ub = [1000, 1000, 1.2, 0.7, pi/4]; % upper bounds
 
-% k_h_grid, k_k_grid, percentage, T
-lb = [1e-6, 1e-6, 0.5, 0.2]; % lower bounds
-ub = [500, 500, 0.9, 0.6]; % upper bounds
+% k_h_grid, k_k_grid, T, percentage
+lb = [1e-6, 1e-6, 0.1, 0.4]; % lower bounds
+ub = [300, 300, 0.6, 0.8]; % upper bounds
 
 n_g = numel(lb);
 n_p = numel(optParameterNames);    % number of optimized params
@@ -89,8 +89,9 @@ n_p = numel(optParameterNames);    % number of optimized params
 input_matrix = latin_hypercube_sampling(lb, ub, n_samples);
 k_h_grid   = input_matrix(:,1);     % hip stiffness
 k_k_grid   = input_matrix(:,2);     % knee stiffness
-percentage_grid = input_matrix(:,3);
-T_grid     = input_matrix(:,4);
+T_grid     = input_matrix(:,3);
+percentage_grid = input_matrix(:,4);
+
 % L_grid     = input_matrix(:,3);     % step length
 % H_grid     = input_matrix(:,4);     % hip height
 % phi_grid   = input_matrix(:,5);     % pitch angle
@@ -101,8 +102,8 @@ input_matrix = repmat(input_matrix, num_v_avg, 1);
 % Define parameter grids for warm start exploration
 k_h_vector   = input_matrix(:,1);     % hip stiffness
 k_k_vector   = input_matrix(:,2);     % knee stiffness
-percentage_vector   = input_matrix(:,3);
-T_vector     = input_matrix(:,4);
+T_vector     = input_matrix(:,3);
+percentage_vector   = input_matrix(:,4);
 
 % L_vector     = input_matrix(:,3);     % step length
 % H_vector     = input_matrix(:,4);     % hip height
@@ -136,10 +137,10 @@ trackOptParam = nan(2, n_p, numel(v_avg_vector));
 
 %% Restart the parallel processing pool. 
 disp('starting warm start')
-delete(gcp('nocreate'));  % close any existing pool
-setenv('OMP_NUM_THREADS', '1');
-setenv('MKL_NUM_THREADS', '1');
-parpool('local');  % Number of local core
+% delete(gcp('nocreate'));  % close any existing pool
+% setenv('OMP_NUM_THREADS', '1');
+% setenv('MKL_NUM_THREADS', '1');
+% parpool('local');  % Number of local core
 
 %% Main Optimization Loop
 kk = 0;
@@ -164,10 +165,10 @@ while kk < numel(v_avg_vector)
     ), 1, min(kk+backup_batchSize, numel(v_avg_vector))-kk);
 
     % Parallel processing of batch
-    parfor i = 1:min(kk+backup_batchSize, numel(v_avg_vector))-kk
+    for i = 1:min(kk+backup_batchSize, numel(v_avg_vector))-kk
         localResult = results(i);
 
-        try
+        % try
             % Configure current iteration
             config_i = config;
             config_i.paramValues.k_h = k_h_vector(i+kk);
@@ -265,11 +266,11 @@ while kk < numel(v_avg_vector)
             localResult.normToOptimal = norm(Z_init-localResult.Z)^2;
             localResult.success       = true;
 
-        catch ME
-            localResult.failReason = ['unhandled error: ', ME.identifier];
-            results(i) = localResult;
-            continue;
-        end
+        % catch ME
+        %     localResult.failReason = ['unhandled error: ', ME.identifier];
+        %     results(i) = localResult;
+        %     continue;
+        % end
                     
         results(i) = localResult;
 
