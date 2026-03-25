@@ -63,8 +63,8 @@ function [h, lb, ub, boundName] = inequalityConstraints(config, Z, P_sym, N)
 
     % Local clearance constraint
     local_lower_bound = 0.8*0.06;
-
-    for k = 1:(n_columns-1)
+    offset = floor(n_columns*0.2);
+    for k = 1:(n_columns-offset)
         lower_bound(k) = local_lower_bound;
     end  
 
