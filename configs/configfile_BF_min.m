@@ -102,8 +102,8 @@ config.simValue.alpha_tau_max = 30;
 
 % Initial state vector.
 % Swing leg landing initial codiation
-config.x0 = [-0.1; 0.29; 0.21; -0.1; -0.54; ...
-             0;    -3; 3;    0;    -1.5];
+% config.x0 = [-0.1; 0.29; 0.21; -0.1; -0.54; ...
+%              0;    -3; 3;    0;    -1.5];
 % Swing leg landing initial codiation
 % config.x0 = [-0.1; 0.29; -0.21; -0.1; -0.34; ...
 %              0;    0; 0;    0;    0]; 
@@ -125,8 +125,8 @@ config.x0 = [-0.1; 0.29; 0.21; -0.1; -0.54; ...
 %              0;    -0.2; 0.65;    0;    -0.9];   
 
 % For optimization
-% config.x0 = [-0.2; 0.7;-0.5;-1;-0.5;
-%              0;  0;   0; 0;  0];
+config.x0 = [-0.2; 0.7;-0.5;-1;-0.5;
+             0;  0;   0; 0;  0];
 
 %% Variable Mapping and Default Values to class variables
 config.defaultStateValues = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0];  % Default state values

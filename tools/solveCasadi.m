@@ -96,8 +96,11 @@ N       = config.N;
 nZ      = numel(Z);
 
 % Optimization bounds of Z
-state_lb    = config.state_lb; % [phi; alphaL; alphaR; betaL; betaR]
-state_ub    = config.state_ub;
+x_lb  = config.x_lb;
+x_ub  = config.x_ub;
+dx_lb = config.dx_lb;
+dx_ub = config.dx_ub;
+
 input_lb    = config.input_lb;
 input_ub    = config.input_ub;
 dt_lb       = config.dt_bounds(1);
@@ -136,19 +139,24 @@ for i = 1:nPhase
     lbZ_i = -inf(n_rows_i, 1);          % upperbounds
     ubZ_i =  inf(n_rows_i, 1);          % lowerbounds
 
-    % Extend bounds
-    nBounds = numel(state_lb);
+    % Extend boundsX
+    nBounds = numel(x_lb);
     if nq > nBounds
-        state_lb = [-inf*ones(nq-nBounds,1);state_lb];
-        state_ub = [ inf*ones(nq-nBounds,1);state_ub];
+        x_lb  = [-inf*ones(nq-nBounds,1);x_lb];
+        x_ub  = [ inf*ones(nq-nBounds,1);x_ub];
+        dx_lb = [-inf*ones(nq-nBounds,1);dx_lb];
+        dx_ub = [ inf*ones(nq-nBounds,1);dx_ub];
     end
+
     % Loop through the bounds of every collocation point
     for k = 1:N(i)+1
         offset  = (k-1) * n_optValues;
 
         % State bounds
-        lbZ_i(offset + (1:nq)) = state_lb;
-        ubZ_i(offset + (1:nq)) = state_ub;
+        lbZ_i(offset + (1:nq)) = x_lb;
+        ubZ_i(offset + (1:nq)) = x_ub;
+        lbZ_i(offset + nq + (1:nq)) = dx_lb;
+        ubZ_i(offset + nq + (1:nq)) = dx_ub;
 
         % Input bounds
         lbZ_i(offset + nX + (1:nu)) = input_lb;

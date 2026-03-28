@@ -20,7 +20,7 @@ config.operatingCond.x0 = 0;                % Initial x-position [m]
 % config.stepLength = 0.5;
 
 config.optGaitMethods = 'Fix_average_velocity';
-config.operatingCond.v_avg = 2;             % Average forward velocity [m/s]
+config.operatingCond.v_avg = 0.7;             % Average forward velocity [m/s]
 
 %% Numerical Discretization
 config.collocationScheme  = 'hermiteSimpson';   % Collocation method for dynamics
@@ -43,10 +43,10 @@ config.periodicityMatrix = eye(10);
 % config.optParameterLowerBound = [-pi/2, -pi/2, 1e-6, 1e-6];               % Minimum leg stiffness
 % config.optParameterUpperBound = [pi/2, pi/2, 1000, 1000];                 % Maximum leg stiffness
 
-config.optParameterNames = {'k_h', 'k_k'};               % Leg stiffness to optimize
-config.optParameterInit  = [20, 20];                          % Initial guess
-config.optParameterLowerBound = [1e-6, 1e-6];               % Minimum leg stiffness
-config.optParameterUpperBound = [1000, 1000];   
+% config.optParameterNames = {'k_h', 'k_k'};               % Leg stiffness to optimize
+% config.optParameterInit  = [20, 20];                          % Initial guess
+% config.optParameterLowerBound = [1e-6, 1e-6];               % Minimum leg stiffness
+% config.optParameterUpperBound = [1000, 1000];   
 
 % config.optParameterNames = {'k_h'};               % Leg stiffness to optimize
 % config.optParameterInit  = [20];                          % Initial guess
@@ -54,10 +54,10 @@ config.optParameterUpperBound = [1000, 1000];
 % config.optParameterUpperBound = [1000];                 % Maximum leg stiffness
 
 % Alternative: No parameter optimization
-% config.optParameterNames = {};
-% config.optParameterInit  = [];
-% config.optParameterLowerBound = [];
-% config.optParameterUpperBound = [];
+config.optParameterNames = {};
+config.optParameterInit  = [];
+config.optParameterLowerBound = [];
+config.optParameterUpperBound = [];
 
 %% Optimize time
 config.optimizeTimeFlag = 1;    % for now always 1
@@ -67,12 +67,17 @@ config.optimizeTimeFlag = 1;    % for now always 1
 config.GRFfunc = '.SingleStance.compute_lambda';          % Define function in the model foe Ground reaction force calculation 
 config.useInequalityConstraints = true;            % Enable inequality constraints
 
-ub_state = [ 0.2*pi;  0.5*pi;  0.5*pi; -0.001; -0.001];
-lb_state = [-0.2*pi; -0.5*pi; -0.5*pi; -pi/2; -pi/2];
+x_lb = [-0.2*pi; -0.5*pi; -0.5*pi; -pi/2; -pi/2];
+x_ub = [0.2*pi;  0.5*pi;  0.5*pi; -0.001; -0.001];
+dx_lb = [-12; -12; -12; -15; -15];
+dx_ub = [12; 12; 12; 15; 15];
+
 % ub_state = [0.5*pi;  inf;  inf; inf; inf];
 % lb_state = [-0.5*pi; -inf; -inf; -inf; -inf];
-config.state_lb = lb_state;
-config.state_ub = ub_state;
+config.x_lb  = x_lb;
+config.x_ub  = x_ub;
+config.dx_lb = dx_lb;
+config.dx_ub = dx_ub;
 
 config.input_lb = [-300; -300; -220; -220];
 config.input_ub = [300; 300; 220; 220];
@@ -137,16 +142,16 @@ config.startContinuationFlag = 0;                  % Start parameter continuatio
 config.cont.type = 'Poorman';                      % Continuation method type
 
 % Operating condition grid settings
-config.cont.gridOpCondNames = {'v_avg'};           % Operating condition variables
+config.cont.gridOpCondNames = {};           % Operating condition variables
 config.cont.gridOpCondMin   = [0.1];               % Minimum operating condition values
 config.cont.gridOpCondMax   = [3];                 % Maximum operating condition values
 config.cont.gridOpCondStep  = [0.025];             % Operating condition step sizes
 
 % Parameter grid settings
-config.cont.gridParamNames = {'k_l'};              % Parameter variables for continuation
-config.cont.gridParamMin   = [1];                  % Minimum parameter values
-config.cont.gridParamMax   = [200];                % Maximum parameter values
-config.cont.gridParamStep  = [1];                  % Parameter step sizes
+config.cont.gridParamNames = {'k_h', 'k_k'};              % Parameter variables for continuation
+config.cont.gridParamMin   = [10, 50];                  % Minimum parameter values
+config.cont.gridParamMax   = [20, 60];                % Maximum parameter values
+config.cont.gridParamStep  = [1, 1];                  % Parameter step sizes
 
 % Cost acceptance thresholds
 config.cont.costSlack = 1e-5;                      % Cost improvement threshold for replacement
@@ -158,7 +163,7 @@ config.cont.n_out   = 5*config.cont.n_batch;       % Maximum output solutions
 
 % File management for continuation
 config.cont.filenameMAT = 'PC';                    % Base filename for continuation data
-config.cont.warmStartMAT = '21_08_WS_weighted_u_squared_CoT_v_avg_HF_compHip_min_kh10';
+config.cont.warmStartMAT = '27_03_WS_u_squared_CoT_v_avg_BF_run_1';
 
 % Visualization settings for continuation results
 config.cont.plotViews = {[1,2]};                   % Parameter pairs to visualize

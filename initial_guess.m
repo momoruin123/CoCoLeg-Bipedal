@@ -121,6 +121,7 @@ elseif strcmp(modelName, 'BF_min')
     traj_guess.x = [q_init; dq_init]';
     traj_guess.u = u_init';
     traj_guess.t = t_init';
+    traj_guess.Phase = 'SingleStance';
 
     % Options: depends on optimizing stiffness or not.
     % traj.p = [20*ones(N+1,1), 20*ones(N+1,1)];
