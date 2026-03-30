@@ -1,8 +1,8 @@
 clear;
 clc;
 %% BF_min: Hopping in place with minimum coordiantes
-configfile_BF_min;
-% configfile_BF_run;
+% configfile_BF_min;
+configfile_BF_run;
 config.optConfig.print_level = 5;
 
 %% Configuration

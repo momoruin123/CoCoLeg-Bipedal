@@ -23,10 +23,6 @@ function [Z_final, cost, return_status] = continuation_single_step(Z_init, grid_
     cost = inf;
     return_status = "Failed_Runtime";
 
-    % Set model stiffness parameters
-    p_vec = getModelParameters(config, 0, 0);
-    sf = p_vec(1)*p_vec(2)*p_vec(3);
-
     try
         % Update operating conditions from grid point values
         n_opCond = numel(config.cont.gridOpCondNames);
@@ -41,7 +37,7 @@ function [Z_final, cost, return_status] = continuation_single_step(Z_init, grid_
         % Set parameter values  
         for i = 1:n_param
             paramName = config.cont.gridParamNames{i};
-            config.paramValues.(paramName) = grid_parfor(n_opCond + i)/sf;
+            config.paramValues.(paramName) = grid_parfor(n_opCond + i);
         end
         
         % Generate optimization problem constraints and costs

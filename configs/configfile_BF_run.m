@@ -20,7 +20,7 @@ config.operatingCond.x0 = 0;                % Initial x-position [m]
 % config.stepLength = 0.5;
 
 config.optGaitMethods = 'Fix_average_velocity';
-config.operatingCond.v_avg = 0.7;             % Average forward velocity [m/s]
+config.operatingCond.v_avg = 1.5;             % Average forward velocity [m/s]
 
 %% Numerical Discretization
 config.collocationScheme  = 'hermiteSimpson';   % Collocation method for dynamics
@@ -151,7 +151,7 @@ config.cont.gridOpCondStep  = [0.025];             % Operating condition step si
 config.cont.gridParamNames = {'k_h', 'k_k'};              % Parameter variables for continuation
 config.cont.gridParamMin   = [10, 50];                  % Minimum parameter values
 config.cont.gridParamMax   = [20, 60];                % Maximum parameter values
-config.cont.gridParamStep  = [1, 1];                  % Parameter step sizes
+config.cont.gridParamStep  = [5, 5];                  % Parameter step sizes
 
 % Cost acceptance thresholds
 config.cont.costSlack = 1e-5;                      % Cost improvement threshold for replacement

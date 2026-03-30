@@ -44,7 +44,7 @@ config.useInequalityConstraints = true;
 config.paramValues.k_h = 20;
 config.paramValues.k_k = 20;
 
-config.optConfig.tolerance = 2;
+config.optConfig.tolerance = 1;
 config.optConfig.print_level = 0;
 
 %% Set up the parameter grid for continuation study
@@ -81,9 +81,9 @@ end
 hPlotsStruct = init_dynamic_plots(gridPts, cost, status, gridNames, config);
 
 %% Restart the parallel computing pool
-cd(fileparts(mfilename('fullpath')))
-delete(gcp('nocreate'));  % close any existing pool
-parpool('local');         % start a fresh pool
+% cd(fileparts(mfilename('fullpath')))
+% delete(gcp('nocreate'));  % close any existing pool
+% parpool('local');         % start a fresh pool
 %% Main continuation loop - process solutions until all are handled
 % As long as there are unprocessed rows, do:
 lastSize = size(status,1); % Track size for save intervals
