@@ -96,10 +96,10 @@ N       = config.N;
 nZ      = numel(Z);
 
 % Optimization bounds of Z
-x_lb  = config.x_lb;
-x_ub  = config.x_ub;
-dx_lb = config.dx_lb;
-dx_ub = config.dx_ub;
+q_lb  = config.x_lb;
+q_ub  = config.x_ub;
+dq_lb = config.dx_lb;
+dq_ub = config.dx_ub;
 
 input_lb    = config.input_lb;
 input_ub    = config.input_ub;
@@ -120,14 +120,6 @@ ubZ         = [];          % lowerbounds
 
 for i = 1:nPhase
     % Get 'get_sizes()' function handle to each phase
-    get_sizes{i} = str2func([config.model_name, '.', config.phaseSequence{i}, '.get_sizes']);
-    [nX, nq, nu, ~] = get_sizes{i}();
-
-    n_rows(i) = (N(i)+1) * (nX+nu+na);
-end
-
-for i = 1:nPhase
-    % Get 'get_sizes()' function handle to each phase
     get_sizes_i = str2func([config.model_name, '.', config.phaseSequence{i}, '.get_sizes']);
     [nX, nq, nu, ~] = get_sizes_i();
 
@@ -140,12 +132,12 @@ for i = 1:nPhase
     ubZ_i =  inf(n_rows_i, 1);          % lowerbounds
 
     % Extend boundsX
-    nBounds = numel(x_lb);
+    nBounds = numel(q_lb);
     if nq > nBounds
-        x_lb  = [-inf*ones(nq-nBounds,1);x_lb];
-        x_ub  = [ inf*ones(nq-nBounds,1);x_ub];
-        dx_lb = [-inf*ones(nq-nBounds,1);dx_lb];
-        dx_ub = [ inf*ones(nq-nBounds,1);dx_ub];
+        q_lb  = [-inf*ones(nq-nBounds,1);q_lb];
+        q_ub  = [ inf*ones(nq-nBounds,1);q_ub];
+        dq_lb = [-inf*ones(nq-nBounds,1);dq_lb];
+        dq_ub = [ inf*ones(nq-nBounds,1);dq_ub];
     end
 
     % Loop through the bounds of every collocation point
@@ -153,10 +145,10 @@ for i = 1:nPhase
         offset  = (k-1) * n_optValues;
 
         % State bounds
-        lbZ_i(offset + (1:nq)) = x_lb;
-        ubZ_i(offset + (1:nq)) = x_ub;
-        lbZ_i(offset + nq + (1:nq)) = dx_lb;
-        ubZ_i(offset + nq + (1:nq)) = dx_ub;
+        lbZ_i(offset + (1:nq)) = q_lb;
+        ubZ_i(offset + (1:nq)) = q_ub;
+        lbZ_i(offset + nq + (1:nq)) = dq_lb;
+        ubZ_i(offset + nq + (1:nq)) = dq_ub;
 
         % Input bounds
         lbZ_i(offset + nX + (1:nu)) = input_lb;

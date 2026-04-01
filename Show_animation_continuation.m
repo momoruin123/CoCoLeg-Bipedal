@@ -2,8 +2,8 @@ clear; clc;
 dt = 3e-2;
 % load data\31_01_WS_u_squared_CoT_v_avg_BF_min_4.mat
 % load data\19_02_PC_u_squared_CoT_v_avg_BF_min_2.mat
-load data\28_03_PC_u_squared_CoT_v_avg_BF_run_2.mat
-
+% load data\28_03_PC_u_squared_CoT_v_avg_BF_run_2.mat
+load 30_03_PC_u_squared_CoT_v_avg_BF_run_3.mat
 configfile_BF_run;
 
 %%

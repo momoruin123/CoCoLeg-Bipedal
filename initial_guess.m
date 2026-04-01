@@ -123,8 +123,9 @@ elseif strcmp(modelName, 'BF_min')
     traj_guess.t = t_init';
     traj_guess.Phase = 'SingleStance';
 
-    % Options: depends on optimizing stiffness or not.
-    % traj.p = [20*ones(N+1,1), 20*ones(N+1,1)];
+    if isParamsFlag
+        traj_guess.p = repmat(optParams, N+1, 1);
+    end
 else
     error('Model name is incorrect or not supported');
 end

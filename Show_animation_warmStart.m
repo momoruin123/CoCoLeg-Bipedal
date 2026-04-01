@@ -2,7 +2,7 @@ clear; clc;
 dt = 3e-2;
 % load data\31_01_WS_u_squared_CoT_v_avg_BF_min_4.mat
 % load data\12_03_WS_u_squared_CoT_v_avg_BF_run_2.mat
-load data\27_03_WS_u_squared_CoT_v_avg_BF_run_1.mat
+load data\31_03_WS_u_squared_CoT_v_avg_BF_run_1.mat
 
 configfile_BF_run;
 

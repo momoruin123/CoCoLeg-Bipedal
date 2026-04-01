@@ -67,17 +67,17 @@ config.optimizeTimeFlag = 1;    % for now always 1
 config.GRFfunc = '.SingleStance.compute_lambda';          % Define function in the model foe Ground reaction force calculation 
 config.useInequalityConstraints = true;            % Enable inequality constraints
 
-x_lb = [-0.2*pi; -0.5*pi; -0.5*pi; -pi/2; -pi/2];
-x_ub = [0.2*pi;  0.5*pi;  0.5*pi; -0.001; -0.001];
-dx_lb = [-12; -12; -12; -15; -15];
-dx_ub = [12; 12; 12; 15; 15];
+q_lb = [-0.2*pi; -0.5*pi; -0.5*pi; -pi/2; -pi/2];
+q_ub = [0.2*pi;  0.5*pi;  0.5*pi; -0.001; -0.001];
+dq_lb = [-12; -12; -12; -15; -15];
+dq_ub = [12; 12; 12; 15; 15];
 
 % ub_state = [0.5*pi;  inf;  inf; inf; inf];
 % lb_state = [-0.5*pi; -inf; -inf; -inf; -inf];
-config.x_lb  = x_lb;
-config.x_ub  = x_ub;
-config.dx_lb = dx_lb;
-config.dx_ub = dx_ub;
+config.x_lb  = q_lb;
+config.x_ub  = q_ub;
+config.dx_lb = dq_lb;
+config.dx_ub = dq_ub;
 
 config.input_lb = [-300; -300; -220; -220];
 config.input_ub = [300; 300; 220; 220];
