@@ -65,7 +65,7 @@ optParameterNames = config.optParameterNames;
 % grid sample of velocity
 % v_avg_grid   = [1.4, 1.7];
 % v_avg_grid   = [0.01, 0.1:0.1:1.5];
-v_avg_grid   =0.5:0.5:5;
+v_avg_grid   =1:0.1:2;
 
 % v_avg_grid   = 0.001:0.1:1.501;
 num_v_avg    = numel(v_avg_grid);
@@ -74,7 +74,7 @@ num_v_avg    = numel(v_avg_grid);
 % k_h_grid, k_k_grid, L_grid, H_grid, phi_grid
 
 % Config. of sampling
-n_samples = 20;
+n_samples = 200;
 % lb = [1e-6, 1e-6, 0, 0, -pi/4]; % lower bounds
 % ub = [1000, 1000, 1.2, 0.7, pi/4]; % upper bounds
 

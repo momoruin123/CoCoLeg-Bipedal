@@ -43,10 +43,10 @@ config.periodicityMatrix = eye(10);
 % config.optParameterLowerBound = [-pi/2, -pi/2, 1e-6, 1e-6];               % Minimum leg stiffness
 % config.optParameterUpperBound = [pi/2, pi/2, 1000, 1000];                 % Maximum leg stiffness
 
-% config.optParameterNames = {'k_h', 'k_k'};               % Leg stiffness to optimize
-% config.optParameterInit  = [20, 20];                          % Initial guess
-% config.optParameterLowerBound = [1e-6, 1e-6];               % Minimum leg stiffness
-% config.optParameterUpperBound = [1000, 1000];   
+config.optParameterNames = {'k_h', 'k_k'};               % Leg stiffness to optimize
+config.optParameterInit  = [20, 20];                          % Initial guess
+config.optParameterLowerBound = [1e-6, 1e-6];               % Minimum leg stiffness
+config.optParameterUpperBound = [1000, 1000];   
 
 % config.optParameterNames = {'k_h'};               % Leg stiffness to optimize
 % config.optParameterInit  = [20];                          % Initial guess
@@ -54,10 +54,10 @@ config.periodicityMatrix = eye(10);
 % config.optParameterUpperBound = [1000];                 % Maximum leg stiffness
 
 % Alternative: No parameter optimization
-config.optParameterNames = {};
-config.optParameterInit  = [];
-config.optParameterLowerBound = [];
-config.optParameterUpperBound = [];
+% config.optParameterNames = {};
+% config.optParameterInit  = [];
+% config.optParameterLowerBound = [];
+% config.optParameterUpperBound = [];
 
 %% Optimize time
 config.optimizeTimeFlag = 1;    % for now always 1
@@ -149,9 +149,9 @@ config.cont.gridOpCondStep  = [0.025];             % Operating condition step si
 
 % Parameter grid settings
 config.cont.gridParamNames = {'k_h', 'k_k'};              % Parameter variables for continuation
-config.cont.gridParamMin   = [10, 50];                  % Minimum parameter values
-config.cont.gridParamMax   = [20, 60];                % Maximum parameter values
-config.cont.gridParamStep  = [5, 5];                  % Parameter step sizes
+config.cont.gridParamMin   = [0, 0];                  % Minimum parameter values
+config.cont.gridParamMax   = [35, 60];                % Maximum parameter values
+config.cont.gridParamStep  = [1, 1];                  % Parameter step sizes
 
 % Cost acceptance thresholds
 config.cont.costSlack = 1e-5;                      % Cost improvement threshold for replacement
