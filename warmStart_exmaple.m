@@ -44,8 +44,8 @@ backup_batchSize = 50;
 % backup_batchSize = 1000;
 
 % Set hip compliance parameter
-config.paramValues.k_h = 20/256;
-config.paramValues.k_k = 20/256;
+config.paramValues.k_h = 20;
+config.paramValues.k_k = 20;
 
 %% Initialize Model Parameters and State
 % Get model parameters and initial state
