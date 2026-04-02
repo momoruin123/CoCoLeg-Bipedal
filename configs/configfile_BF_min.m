@@ -69,15 +69,20 @@ config.useInequalityConstraints = true;            % Enable inequality constrain
 % config.inequalityParamLowerBound = [1];
 % config.inequalityParamUpperBound = [200]; 
 
-ub_state = [ 0.5*pi;  0.5*pi;  0.5*pi;   -0.001;   -0.001];
-lb_state = [-0.5*pi; -0.5*pi; -0.5*pi; -pi/2; -pi/2];
+q_lb = [-0.2*pi; -0.5*pi; -0.5*pi; -pi/2; -pi/2];
+q_ub = [0.2*pi;  0.5*pi;  0.5*pi; -0.001; -0.001];
+dq_lb = [-12; -12; -12; -15; -15];
+dq_ub = [12; 12; 12; 15; 15];
+
 % ub_state = [0.5*pi;  inf;  inf; inf; inf];
 % lb_state = [-0.5*pi; -inf; -inf; -inf; -inf];
-config.state_lb = lb_state;
-config.state_ub = ub_state;
+config.q_lb  = q_lb;
+config.q_ub  = q_ub;
+config.dq_lb = dq_lb;
+config.dq_ub = dq_ub;
 
-config.input_lb = [-inf; -inf; -inf; -inf];
-config.input_ub = [inf; inf; inf; inf];
+config.input_lb = [-300; -300; -220; -220];
+config.input_ub = [300; 300; 220; 220];
 
 config.dt_bounds = [0.002, 0.05];
 
@@ -125,9 +130,8 @@ config.simValue.alpha_tau_max = 30;
 %              0;    -0.2; 0.65;    0;    -0.9];   
 
 % For optimization
-config.x0 = [-0.2; 0.7;-0.5;-1;-0.5;
+config.x0 = [0; 0.7;-0.5;-0.4;-0.1;
              0;  0;   0; 0;  0];
-
 %% Variable Mapping and Default Values to class variables
 config.defaultStateValues = [0; 0; 0; 0; 0; 0; 0; 0; 0; 0];  % Default state values
 config.defaultInputValues = [0; 0; 0; 0];                    % Default input values

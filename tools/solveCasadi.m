@@ -96,10 +96,10 @@ N       = config.N;
 nZ      = numel(Z);
 
 % Optimization bounds of Z
-q_lb  = config.x_lb;
-q_ub  = config.x_ub;
-dq_lb = config.dx_lb;
-dq_ub = config.dx_ub;
+q_lb  = config.q_lb;
+q_ub  = config.q_ub;
+dq_lb = config.dq_lb;
+dq_ub = config.dq_ub;
 
 input_lb    = config.input_lb;
 input_ub    = config.input_ub;

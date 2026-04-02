@@ -1,8 +1,8 @@
 clear;
 clc;
 %% BF_min: Hopping in place with minimum coordiantes
-% configfile_BF_min;
-configfile_BF_run;
+configfile_BF_min;
+% configfile_BF_run;
 config.optConfig.print_level = 5;
 
 %% Configuration
@@ -13,7 +13,9 @@ config.paramValues.k_k = 20;
 %% Initial guess
 % trajInit = flow(config, dt);
 
-trajInit = initial_guess(config, 1, 0.5, 1);
+% trajInit = initial_guess(config, 1, 0.5, 1);
+trajInit = initial_guess(config, 0.7, 0.5, 1);
+
 traj_full = trajToFulltraj(config, trajInit, 1);
 getAnimationRABBIT(traj_full, 0, config,[]);
 

@@ -1,6 +1,0 @@
-########## Phase: SingleStance ##########
-No file found for BF_run.SingleStance.inequaliyConstraints
-
-########## Phase: Flight ##########
-No file found for BF_run.Flight.inequaliyConstraints
-
