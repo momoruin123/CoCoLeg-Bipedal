@@ -1,4 +1,4 @@
-function traj_guess = initial_guess(config, init_stepTime, timePercentage, isParamsFlag)
+function traj_guess = initial_guess(config, init_stepTime, isParamsFlag, timePercentage)
 modelName = config.model_name;
 T = init_stepTime;
 P = getModelParameters(config, 0, 0);

@@ -62,8 +62,8 @@ optParameterNames = config.optParameterNames;
 
 %% Define Parameter Grids for Warm Start
 % grid sample of velocity
-% v_avg_grid   = [0.4, 0.7];
-v_avg_grid   = [0.01, 0.1:0.1:1.5];
+v_avg_grid   = [0.4, 0.7];
+% v_avg_grid   = [0.01, 0.1:0.1:1.5];
 % v_avg_grid   = 0.001:0.1:1.501;
 num_v_avg    = numel(v_avg_grid);
 
@@ -72,8 +72,8 @@ num_v_avg    = numel(v_avg_grid);
 
 % Config. of sampling
 n_samples = 1;
-lb = [0/256, 0/256, 0, 0, -pi/2]; % lower bounds
-ub = [100/256, 100/256, 1.4, 0.8, pi/2]; % upper bounds
+lb = [0, 0, 0.4, 0.4, -pi/3]; % lower bounds
+ub = [100, 100, 1, 0.8, pi/3]; % upper bounds
 
 % lb = [0/256, 0/256, 0.6, 0.5, 0]; % lower bounds
 % ub = [0/256, 0/256, 0.6, 0.5, 0]; % upper bounds
@@ -179,7 +179,12 @@ while kk < numel(v_avg_vector)
             % Generate initial guess trajectory
             % 1. Interpolation
             T_i_guess = L_vector(i+kk) / v_avg_vector(i+kk);
-            trajInit = initial_guess(config_i, T_i_guess);
+            trajInit = initial_guess(config_i, T_i_guess, 0);
+
+            traj_full = trajToFulltraj(config, trajInit, 0);
+            getAnimationRABBIT(traj_full, 0, config,[]);
+
+
             Z_init = interpolate_traj2Z(config_i, trajInit);
 
             % 2. Simulation

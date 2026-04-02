@@ -13,8 +13,8 @@ config.paramValues.k_k = 20;
 %% Initial guess
 % trajInit = flow(config, dt);
 
-% trajInit = initial_guess(config, 1, 0.5, 1);
-trajInit = initial_guess(config, 0.7, 0.5, 1);
+% trajInit = initial_guess(config, 1, 1, 0.5);
+trajInit = initial_guess(config, 0.7, 1, 0.5);
 
 traj_full = trajToFulltraj(config, trajInit, 1);
 getAnimationRABBIT(traj_full, 0, config,[]);
