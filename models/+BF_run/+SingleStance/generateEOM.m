@@ -227,8 +227,8 @@ tau_passive_m = B_m*[Fpassive_leftHip; Fpassive_rightHip; Fpassive_leftKnee; Fpa
 %% Continuous Dynamics
 % Compute acceleration: ddq = M^(-1) * (tau - C*dq - G)
 % acc = M \ (-C-G+tau_J+B*u);
-forces_f = simplify(-C_f-G_f + tau_Spring_f + B_f*u);
-forces_m = simplify(-C_m-G_m + tau_Spring_m + B_m*u);
+forces_f = simplify(-C_f-G_f + tau_passive_f + B_f*u);
+forces_m = simplify(-C_m-G_m + tau_passive_m + B_m*u);
 
 %% CONSTRAINT DYNAMICS 
 % Contact points:

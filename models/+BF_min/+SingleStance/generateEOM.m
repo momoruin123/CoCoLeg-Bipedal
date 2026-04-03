@@ -1,9 +1,12 @@
 % System: bipedal robot with only SingleStance phases
-% phase: SingleStance
+% phase now: SingleStance
 % Generates dynamics, constraints, and transition functions for optimization
 
 cd(fileparts(mfilename('fullpath')))
 %% Floating-Base coordinate description
+nX_f = 14;  % Number of states
+nq_f = nX_f/2;  % Number of generalized coordinates
+
 % Generalized coordinates and velocities
 x       = sym('x', 'real');           % x of 
 y       = sym('y', 'real');           % y of 
@@ -24,23 +27,16 @@ dbeta_r  = sym('dbeta_r','real');     % rightLeg_knee angle
 % State vectors
 q_f  = [x y phi alpha_l alpha_r beta_l beta_r]';        
 dq_f = [dx dy dphi dalpha_l dalpha_r dbeta_l dbeta_r]';   
+X_f = [q_f; dq_f];
 
 %% Minimal coordinate description
-q1 = phi;
-q2 = alpha_l;
-q3 = alpha_r;
-q4 = beta_l;
-q5 = beta_r;
-
-dq1 = dphi;
-dq2 = dalpha_l;
-dq3 = dalpha_r;
-dq4 = dbeta_l;
-dq5 = dbeta_r;
+nX_m = 10;  % Number of states
+nq_m = nX_m/2;  % Number of generalized coordinates
 
 % State vectors
-q_m  = [q1 q2 q3 q4 q5]';        % Generalized coordinates
-dq_m = [dq1 dq2 dq3 dq4 dq5]';   % Generalized velocities
+q_m  = [phi alpha_l alpha_r beta_l beta_r]';        % Generalized coordinates
+dq_m = [dphi dalpha_l dalpha_r dbeta_l dbeta_r]'; % Generalized velocities
+X_m = [q_m; dq_m];
 
 %% Control inputs
 u_hl = sym('u_hl','real');  % Hip_leftLeg torque
@@ -48,11 +44,8 @@ u_hr = sym('u_hr','real');  % Hip_rightLeg torque
 u_kl = sym('u_kl','real');   % LeftLeg_knee torque
 u_kr = sym('u_kr','real');   % RightLeg_knee torque
 
-%% State vectors
-u = [u_hl; u_hr; u_kl; u_kr]; % input vector
-
-X_f = [q_f; dq_f];
-X_m = [q_m; dq_m];   
+% input vector
+u = [u_hl; u_hr; u_kl; u_kr];
 
 %% Model Parameters
 % Define symbolic physical parameters
@@ -86,101 +79,78 @@ l_3     = l - l_2;                  % Shank length
 % Gravity vector
 g_vec   = [0; -g];
 
-%% DYNAMICS (obtained via the Euler-Lagrange equation)
-% CoG-orientations (from kinematics):
-CoG_Torso_ang       = q1;
-CoG_StanceThigh_ang = q1 + q2;
-CoG_StanceShank_ang = q1 + q2 + q4;
-CoG_SwingThigh_ang  = q1 + q3;
-CoG_SwingShank_ang  = q1 + q3 + q5;
+%% Kinematics
+% Centers of Gravity (CoG) and velocities computed via Jacobians
+% Angles of the centers of gravity (CoG)
+CoG_Torso_ang       = phi;
+CoG_StanceThigh_ang = phi + alpha_l;
+CoG_StanceShank_ang = phi + alpha_l + beta_l;
+CoG_SwingThigh_ang  = phi + alpha_r;
+CoG_SwingShank_ang  = phi + alpha_r + beta_r;
 
-% Links-positions (from kinematics):
-StanceFoot  = [x; y];
-StanceKnee  = StanceFoot + [-l_3*sin(CoG_StanceShank_ang);
+% Positions of the links (CoG):
+Link_StanceFoot  = [x; y];
+Link_StanceKnee  = Link_StanceFoot + [-l_3*sin(CoG_StanceShank_ang);
                             +l_3*cos(CoG_StanceShank_ang)];
-Hip         = StanceKnee + [-l_2*sin(CoG_StanceThigh_ang);
+Link_Hip         = Link_StanceKnee + [-l_2*sin(CoG_StanceThigh_ang);
                             +l_2*cos(CoG_StanceThigh_ang)];
-Head        = Hip + [-l_1*sin(CoG_Torso_ang);
+Link_Head        = Link_Hip + [-l_1*sin(CoG_Torso_ang);
                      +l_1*cos(CoG_Torso_ang)];
 
-SwingKnee   = Hip + [+l_2*sin(CoG_SwingThigh_ang);
+Link_SwingKnee   = Link_Hip + [+l_2*sin(CoG_SwingThigh_ang);
                      -l_2*cos(CoG_SwingThigh_ang)];
-SwingFoot   = SwingKnee + [+l_3*sin(CoG_SwingShank_ang);
+Link_SwingFoot   = Link_SwingKnee + [+l_3*sin(CoG_SwingShank_ang);
                            -l_3*cos(CoG_SwingShank_ang)];
 
-% CoG-positions (from kinematics):
-CoG_StanceShank = StanceFoot + [-(l_3-d_3)*sin(CoG_StanceShank_ang);
+% Positions of the centers of gravity (CoG):
+CoG_StanceShank = Link_StanceFoot + [-(l_3-d_3)*sin(CoG_StanceShank_ang);
                                 +(l_3-d_3)*cos(CoG_StanceShank_ang)];
-CoG_StanceThigh = StanceKnee + [-(l_2-d_2)*sin(CoG_StanceThigh_ang);
+CoG_StanceThigh = Link_StanceKnee + [-(l_2-d_2)*sin(CoG_StanceThigh_ang);
                                 +(l_2-d_2)*cos(CoG_StanceThigh_ang)];
-CoG_Torso       = Hip + [-d_1*sin(CoG_Torso_ang);
+CoG_Torso       = Link_Hip + [-d_1*sin(CoG_Torso_ang);
                          +d_1*cos(CoG_Torso_ang)];
 
-CoG_SwingThigh  = Hip + [+d_2*sin(CoG_SwingThigh_ang);
+CoG_SwingThigh  = Link_Hip + [+d_2*sin(CoG_SwingThigh_ang);
                          -d_2*cos(CoG_SwingThigh_ang)];
-CoG_SwingShank  = SwingKnee + [+d_3*sin(CoG_SwingShank_ang);
+CoG_SwingShank  = Link_SwingKnee + [+d_3*sin(CoG_SwingShank_ang);
                                -d_3*cos(CoG_SwingShank_ang)];
 
-% CoG-velocities (computed via jacobians):
+% Velocities of the CoG:
+% linear velocities
 d_CoG_Torso           = jacobian(CoG_Torso,q_f)*dq_f;
 d_CoG_StanceThigh     = jacobian(CoG_StanceThigh,q_f)*dq_f;
 d_CoG_StanceShank     = jacobian(CoG_StanceShank,q_f)*dq_f;
 d_CoG_SwingThigh      = jacobian(CoG_SwingThigh,q_f)*dq_f;
 d_CoG_SwingShank      = jacobian(CoG_SwingShank,q_f)*dq_f;
-d_CoG_SwingFoot       = jacobian(SwingFoot,q_f)*dq_f;
-
+d_CoG_SwingFoot       = jacobian(Link_SwingFoot,q_f)*dq_f;
+% angular velocities
 d_CoG_Torso_ang       = jacobian(CoG_Torso_ang,q_f)*dq_f;
 d_CoG_StanceThigh_ang = jacobian(CoG_StanceThigh_ang,q_f)*dq_f;
 d_CoG_StanceShank_ang = jacobian(CoG_StanceShank_ang,q_f)*dq_f;
 d_CoG_SwingThigh_ang  = jacobian(CoG_SwingThigh_ang,q_f)*dq_f;
 d_CoG_SwingShank_ang  = jacobian(CoG_SwingShank_ang,q_f)*dq_f;
 
-% Distance from Hip to CoG_Shank
-Hip2StanceShank    = Hip-CoG_StanceShank;
-Hip2StanceShank_sq = simplify(Hip2StanceShank'*Hip2StanceShank);
-Hip2SwingShank     = Hip-CoG_SwingShank;
-Hip2SwingShank_sq  = simplify(Hip2SwingShank'*Hip2SwingShank);    
-
-% Damping coefficients from damping ratios
-% b_hL = 2*xi_h*sqrt(k_h*(theta_2+m_2*d_2^2+theta_3+m_3*Hip2StanceShank_sq));
-% b_hR = 2*xi_h*sqrt(k_h*(theta_2+m_2*d_2^2+theta_3+m_3*Hip2SwingShank_sq));
-% b_kL = 2*xi_k*sqrt(k_k*(theta_3+m_3*d_3^2));
-% b_kR = 2*xi_k*sqrt(k_k*(theta_3+m_3*d_3^2));
-
-b_hL = 16.5;
-b_hR = 16.5;
-b_kL = 5.48;
-b_kR = 5.48;
-
-% b_hL = 0;
-% b_hR = 0;
-% b_kL = 0;
-% b_kR = 0;
-
 %% Summary of positons
 % CoGs (incl orientation of the segments):
-CoGs = [CoG_Torso,     CoG_StanceThigh,     CoG_StanceShank,     CoG_SwingThigh,     CoG_SwingShank;
+CoGs_f = [CoG_Torso,     CoG_StanceThigh,     CoG_StanceShank,     CoG_SwingThigh,     CoG_SwingShank;
         CoG_Torso_ang, CoG_StanceThigh_ang, CoG_StanceShank_ang, CoG_SwingThigh_ang, CoG_SwingShank_ang];
-
-% Links (or rather: joint positions)
-links = [StanceFoot, StanceKnee, Hip, Head, SwingKnee, SwingFoot];
-
-% Position of the foot points:     
-footPts = [StanceFoot, SwingFoot];
+CoGs_m = simplify(subs(CoGs_f, {x, y, dx, dy}, {0, 0, 0, 0}));
+% Links (or rather: joint positions) [2*6]
+links_f = [Link_StanceFoot, Link_StanceKnee, Link_Hip, Link_Head, Link_SwingKnee, Link_SwingFoot];
+links_m = simplify(subs(links_f, {x, y, dx, dy}, {0, 0, 0, 0}));
 
 %% Energy Formulation
 % Potential Energy (due to gravity):
-V_grav = CoG_Torso(2)*m_1*g + ...
+V_grav = simplify(CoG_Torso(2)*m_1*g + ...
     CoG_StanceThigh(2)*m_2*g + ...
     CoG_SwingThigh(2)*m_2*g + ...
     CoG_StanceShank(2)*m_3*g + ...
-    CoG_SwingShank(2)*m_3*g;
-V_grav = simplify(V_grav);
-V_spring  = 0.5*k_h*(alpha0-alpha_l).^2 + ...
-            0.5*k_h*(alpha0-alpha_r).^2 + ...
-            0.5*k_k*(beta0-beta_l).^2 + ...
-            0.5*k_k*(beta0-beta_r).^2;
-V = V_grav + V_spring;
+    CoG_SwingShank(2)*m_3*g);
+V_spring = simplify(0.5*k_h*(alpha0-alpha_l).^2 + ...
+    0.5*k_h*(alpha0-alpha_r).^2 + ...
+    0.5*k_k*(beta0-beta_l).^2 + ...
+    0.5*k_k*(beta0-beta_r).^2);
+V = simplify(V_grav + V_spring);
 
 % Kinetic Energy:
 T = 0.5 * ( m_1 * (d_CoG_Torso'*d_CoG_Torso) + ...
@@ -195,7 +165,7 @@ T = 0.5 * ( m_1 * (d_CoG_Torso'*d_CoG_Torso) + ...
             theta_3 * d_CoG_SwingShank_ang^2);
 T = simplify(T);
 
-%% Total Energy
+% Total Energy
 E = simplify(T + V);
 
 %% Euler-Lagrange Equations
@@ -208,31 +178,51 @@ T = simplify(subs(T, {x, y, dx, dy}, {0, 0, 0, 0}));
 V_grav = simplify(subs(V_grav, {x, y, dx, dy}, {0, 0, 0, 0}));
 [M_m, C_m, G_m] = eulerLagrange(T, V_grav, q_m, dq_m); 
 
-% Spring and damping forces
-Fspring_leftHip   = k_h*(alpha0-alpha_l) + b_hL*(0-dalpha_l); 
-Fspring_rightHip  = k_h*(alpha0-alpha_r) + b_hR*(0-dalpha_r); 
-Fspring_leftKnee  = k_k*(beta0-beta_l)  + b_kL*(0-dbeta_l); 
-Fspring_rightKnee = k_k*(beta0-beta_r)  + b_kR*(0-dbeta_r); 
+%% Passive torques
+% Damping coefficients
+b_hL = 16.5;
+b_hR = 16.5;
+b_kL = 5.48;
+b_kR = 5.48;
 
 % Input mapping matrices
 % Floating base input matrix
-B_f = [[0,0,0,0];...      % x
-       [0,0,0,0];...      % y
-       [0,0,0,0];...      % phi
-       [1,0,0,0];...      % alpha_l
-       [0,1,0,0];...      % alpha_r
-       [0,0,1,0];...      % beta_l
-       [0,0,0,1]];        % beta_r
+B_f = [[0,0,0,0];...        % x
+       [0,0,0,0];...        % y
+       [0,0,0,0];...        % phi
+       [1,0,0,0];...        % alpha_l
+       [0,1,0,0];...        % alpha_r
+       [0,0,1,0];...        % beta_l
+       [0,0,0,1]];          % beta_r
 % Minimal coordinate input matrix
-B_m = [[0,0,0,0];...
-       [1,0,0,0];...
-       [0,1,0,0];...
-       [0,0,1,0];...
-       [0,0,0,1]];
+B_m = [[0,0,0,0];...        % phi
+       [1,0,0,0];...        % alpha_l
+       [0,1,0,0];...        % alpha_r
+       [0,0,1,0];...        % beta_l
+       [0,0,0,1]];          % beta_r
 
 % Passive spring torques
+% Spring forces
+Fspring_leftHip   = k_h*(alpha0-alpha_l); 
+Fspring_rightHip  = k_h*(alpha0-alpha_r); 
+Fspring_leftKnee  = k_k*(beta0-beta_l);  
+Fspring_rightKnee = k_k*(beta0-beta_r);  
+% Damping forces
+Fdamping_leftHip   = b_hL*(0-dalpha_l);
+Fdamping_rightHip  = b_hR*(0-dalpha_r);
+Fdamping_leftKnee  = b_kL*(0-dbeta_l); 
+Fdamping_rightKnee = b_kR*(0-dbeta_r); 
+% Passive forces         
+Fpassive_leftHip   = Fdamping_leftHip   + Fspring_leftHip;
+Fpassive_rightHip  = Fdamping_rightHip  + Fspring_rightHip;
+Fpassive_leftKnee  = Fdamping_leftKnee  + Fspring_leftKnee;
+Fpassive_rightKnee = Fdamping_rightKnee + Fspring_rightKnee;
+% torques of spring
 tau_Spring_f = B_f*[Fspring_leftHip; Fspring_rightHip; Fspring_leftKnee; Fspring_rightKnee];
 tau_Spring_m = B_m*[Fspring_leftHip; Fspring_rightHip; Fspring_leftKnee; Fspring_rightKnee];
+% passive torques
+tau_passive_f = B_f*[Fpassive_leftHip; Fpassive_rightHip; Fpassive_leftKnee; Fpassive_rightKnee];
+tau_passive_m = B_m*[Fpassive_leftHip; Fpassive_rightHip; Fpassive_leftKnee; Fpassive_rightKnee];
 
 %% Continuous Dynamics
 % Compute acceleration: ddq = M^(-1) * (tau - C*dq - G)
@@ -242,26 +232,21 @@ forces_m = simplify(-C_m-G_m + tau_Spring_m + B_m*u);
 
 %% CONSTRAINT DYNAMICS 
 % Contact points:
-pos_StanceFoot_f = StanceFoot;
-pos_SwingFoot_f  = SwingFoot;
+pos_StanceFoot_f = Link_StanceFoot;
+pos_SwingFoot_f  = Link_SwingFoot;
 pos_StanceFoot_m = subs(pos_StanceFoot_f, {x, y, dx, dy}, {0, 0, 0, 0});
 pos_SwingFoot_m  = subs(pos_SwingFoot_f, {x, y, dx, dy}, {0, 0, 0, 0});
 
 % Constraint Jacobians:
 % Floating base
 [J_StanceConstraint_f, dJ_StanceConstraint_f] = computeContactMatrix(pos_StanceFoot_f, q_f, dq_f);
-[J_SwingConstraint_f , dJ_SwingConstraint_f] = computeContactMatrix(pos_SwingFoot_f, q_f, dq_f);
+[J_SwingConstraint_f , dJ_SwingConstraint_f]  = computeContactMatrix(pos_SwingFoot_f, q_f, dq_f);
 % Minimal coordinate
 [J_StanceConstraint_m, dJ_StanceConstraint_m] = computeContactMatrix(pos_StanceFoot_m, q_m, dq_m);
-[J_SwingConstraint_m , dJ_SwingConstraint_m] = computeContactMatrix(pos_SwingFoot_m, q_m, dq_m);
-
-%% Inverse Kinematics
-Hip_m = subs(Hip, {x, y, dx, dy}, {0, 0, 0, 0});
-[J_Hip_m, ~] = computeContactMatrix(Hip_m, q_m, dq_m);
+[J_SwingConstraint_m , dJ_SwingConstraint_m]  = computeContactMatrix(pos_SwingFoot_m, q_m, dq_m);
 
 %% Event and Jump Functions for Phase Transitions
-event_td = SwingFoot(2);
-event_td = subs(event_td, {x, y, dx, dy}, {0, 0, 0, 0});
+event_td = subs(Link_SwingFoot(2), {x, y, dx, dy}, {0, 0, 0, 0});
 
 %% Compute positive mechanical work
 % Smooth approximation of mechanical power
@@ -273,22 +258,23 @@ p = [g; m; l; m_2; m_3; theta_1; theta_2; theta_3; l_1; l_2; d_1; d_2; d_3; alph
 %% Automatic Function Generation
 % Generate MATLAB functions for the dynamics and their derivatives
 % Generate MATLAB functions and export them to files
+% Dynamics
 matlabFunction(M_f, 'File', 'massMatrix_f', 'Vars', {X_f, p});
 matlabFunction(forces_f, 'File', 'forces_f', 'Vars', {X_f, u, p});
 matlabFunction(M_m, 'File', 'massMatrix_m', 'Vars', {X_m, p});
 matlabFunction(forces_m, 'File', 'forces_m', 'Vars', {X_m, u, p});
-
 matlabFunction(E, 'File', 'energyLevel', 'Vars', {X_f, u, p});
 matlabFunction(posMechWork, 'File', 'posMechWork', 'Vars', {X_m, u});
 
-% for constraints and collisions:
+% Constraints and Constraints jacobian 
+% Stance foot constraint
 matlabFunction(pos_StanceFoot_f,'file','pos_StanceFoot_f','vars',{X_f, p});
 matlabFunction(J_StanceConstraint_f,'file','J_StanceConstraint_f','vars',{X_f, p});
 matlabFunction(dJ_StanceConstraint_f,'file','dJ_StanceConstraint_f','vars',{X_f p});
 matlabFunction(pos_StanceFoot_m,'file','pos_StanceFoot_m','vars',{X_m, p});
 matlabFunction(J_StanceConstraint_m,'file','J_StanceConstraint_m','vars',{X_m, p});
 matlabFunction(dJ_StanceConstraint_m,'file','dJ_StanceConstraint_m','vars',{X_m p});
-
+% Swing foot constraint
 matlabFunction(pos_SwingFoot_f,'file','pos_SwingFoot_f','vars',{X_f, p});
 matlabFunction(J_SwingConstraint_f,'file','J_SwingConstraint_f','vars',{X_f, p});
 matlabFunction(dJ_SwingConstraint_f,'file','dJ_SwingConstraint_f','vars',{X_f p});
@@ -296,17 +282,11 @@ matlabFunction(pos_SwingFoot_m,'file','pos_SwingFoot_m','vars',{X_m, p});
 matlabFunction(J_SwingConstraint_m,'file','J_SwingConstraint_m','vars',{X_m, p});
 matlabFunction(dJ_SwingConstraint_m,'file','dJ_SwingConstraint_m','vars',{X_m p});
 
-% for inverse kinematics
-matlabFunction(J_Hip_m,'file','J_Hip_m','vars',{X_m, p});
-
-% for graphics:
-matlabFunction(CoGs,'file','CoGPositions_f','vars',{X_f, p});
-matlabFunction(links,'file','LinkPositions_f','vars',{X_f, p});
-matlabFunction(footPts,'file','FootPositions_f','vars',{X_f, p});
-
-% spring forces
-matlabFunction(tau_Spring_f,'file','tau_Spring_f','vars',{X_f, p});
-matlabFunction(tau_Spring_m,'file','tau_Spring_m','vars',{X_m, p});
+% Kinematics:
+matlabFunction(CoGs_f,'file','CoGPositions_f','vars',{X_f, p});
+matlabFunction(links_f,'file','LinkPositions_f','vars',{X_f, p});
+matlabFunction(CoGs_m,'file','CoGPositions_m','vars',{X_m, p});
+matlabFunction(links_m,'file','LinkPositions_m','vars',{X_m, p});
 
 %% Create packages for transitions
 % Define package folder names (in current folder)
@@ -333,9 +313,9 @@ np   = numel(p);
 
 % Create a function file that returns these sizes
 fid = fopen('get_sizes.m', 'w');
-fprintf(fid, 'function [nX_m, nq_m, nu, np] = get_sizes()\n');
-fprintf(fid, 'nX_m = %d;\n', nX_m);
-fprintf(fid, 'nq_m = %d;\n', nq_m);
+fprintf(fid, 'function [nX_f, nq_f, nu, np] = get_sizes()\n');
+fprintf(fid, 'nX_f = %d;\n', nX_m);
+fprintf(fid, 'nq_f = %d;\n', nq_m);
 fprintf(fid, 'nu = %d;\n', nu);
 fprintf(fid, 'np = %d;\n', np);
 fprintf(fid, 'end\n');

@@ -56,7 +56,7 @@ gridNames = config.cont.gridParamNames; % Grid variable names
 
 % Batch size for parallel processing:
 n_batch = config.cont.n_batch;
-n_batch = 2;
+n_batch = 1;
 % Every n_out iteration is visulized and saved
 n_out   = config.cont.n_out;
 

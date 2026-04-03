@@ -136,11 +136,11 @@ trackCost = nan(2, numel(v_avg_vector));
 trackOptParam = nan(2, n_p, numel(v_avg_vector)); 
 
 %% Restart the parallel processing pool. 
-disp('starting warm start')
-delete(gcp('nocreate'));  % close any existing pool
-setenv('OMP_NUM_THREADS', '1');
-setenv('MKL_NUM_THREADS', '1');
-parpool('local');  % Number of local core
+% disp('starting warm start')
+% delete(gcp('nocreate'));  % close any existing pool
+% setenv('OMP_NUM_THREADS', '1');
+% setenv('MKL_NUM_THREADS', '1');
+% parpool('local');  % Number of local core
 
 %% Main Optimization Loop
 kk = 0;
@@ -165,10 +165,10 @@ while kk < numel(v_avg_vector)
     ), 1, min(kk+backup_batchSize, numel(v_avg_vector))-kk);
 
     % Parallel processing of batch
-    parfor i = 1:min(kk+backup_batchSize, numel(v_avg_vector))-kk
+    for i = 1:min(kk+backup_batchSize, numel(v_avg_vector))-kk
         localResult = results(i);
 
-        try
+        % try
             % Configure current iteration
             config_i = config;
             config_i.paramValues.k_h = k_h_vector(i+kk);
@@ -266,11 +266,11 @@ while kk < numel(v_avg_vector)
             localResult.normToOptimal = norm(Z_init-localResult.Z)^2;
             localResult.success       = true;
 
-        catch ME
-            localResult.failReason = ['unhandled error: ', ME.identifier];
-            results(i) = localResult;
-            continue;
-        end
+        % catch ME
+        %     localResult.failReason = ['unhandled error: ', ME.identifier];
+        %     results(i) = localResult;
+        %     continue;
+        % end
                     
         results(i) = localResult;
 

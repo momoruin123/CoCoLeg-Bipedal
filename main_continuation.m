@@ -41,13 +41,11 @@ config.optParameterNames = {};
 config.useInequalityConstraints = true;
 
 % Set model stiffness parameters
-p_vec = getModelParameters(config, 0, 0);
-sf = p_vec(1)*p_vec(2)*p_vec(3);
-config.paramValues.k_h = 20/sf;
-config.paramValues.k_k = 20/sf;
+onfig.paramValues.k_h = 20;
+config.paramValues.k_k = 20;
 
-config.optConfig.tolerance = 2;
-config.optConfig.print_level = 5;
+% config.optConfig.tolerance = 1;
+% config.optConfig.print_level = 5;
 
 %% Set up the parameter grid for continuation study
 nGrid     = numel(config.cont.gridParamNames); % Total grid dimensions
@@ -58,7 +56,7 @@ gridNames = config.cont.gridParamNames; % Grid variable names
 
 % Batch size for parallel processing:
 % n_batch = config.cont.n_batch;
-n_batch = 2;
+n_batch = 500;
 % Every n_out iteration is visulized and saved
 n_out   = config.cont.n_out;
 
@@ -83,9 +81,9 @@ end
 hPlotsStruct = init_dynamic_plots(gridPts, cost, status, gridNames, config);
 
 %% Restart the parallel computing pool
-% cd(fileparts(mfilename('fullpath')))
-% delete(gcp('nocreate'));  % close any existing pool
-% parpool('local');         % start a fresh pool
+cd(fileparts(mfilename('fullpath')))
+delete(gcp('nocreate'));  % close any existing pool
+parpool('local');         % start a fresh pool
 %% Main continuation loop - process solutions until all are handled
 % As long as there are unprocessed rows, do:
 lastSize = size(status,1); % Track size for save intervals
@@ -105,7 +103,7 @@ try
         grid_parfor = gridPts(indices(1:min(sum(status<=0),n_batch)), :);
         
         % Process batch in parallel
-        % parfor
+        % parforend
         parfor i = 1:min(sum(status<=0),n_batch)  % for debuggining you need to turn off parallel computing
             % Process them in the optimizer:
             [z_finalRun(i,:), costRun(i), return_status] = continuation_single_step(z_parfor(i,:)', grid_parfor(i,:), traj, config);
@@ -309,9 +307,6 @@ function [z_initial, z_final, gridPts, cost, status, traj, n_z] = initializeFrom
         error('Warm start file does not exist: %s', warmstartfileMAT);
     end
     
-    p_vec = getModelParameters(config, 0, 0);
-    sf = p_vec(1)*p_vec(2)*p_vec(3);
-
     % Load warm start data
     load(warmstartfileMAT, 'Z_array', 'cost_array', 'gridPoint_array', 'numConverged_array', 'largestNorm');
 
@@ -328,7 +323,8 @@ function [z_initial, z_final, gridPts, cost, status, traj, n_z] = initializeFrom
     gridPts = (k .* gridStep);
     
     % Verify warm start solutions through parallel optimization
-    for i = 1:numel(optIdx)
+    % parforend
+    parfor i = 1:numel(optIdx)
         [z_finalRun(i,:), costRun(i), return_status] = continuation_single_step(z_warmstart(i,:)', gridPts(i,:), traj, config);
         convergedRun(i) = return_status=="Solve_Succeeded";
     end
