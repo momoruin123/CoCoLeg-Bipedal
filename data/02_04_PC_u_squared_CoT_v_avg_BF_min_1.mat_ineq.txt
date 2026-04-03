@@ -1,0 +1,3 @@
+########## Phase: SingleStance ##########
+No file found for BF_min.SingleStance.inequaliyConstraints
+
